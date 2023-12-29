@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package rpc;
+
+service ZkWasm {
+    rpc Setup (SetupRequest) returns (SetupReply) {}
+}
+
+message SetupRequest {
+    uint32 zkwasm_k = 1;
+    string wasm_image_id = 2;
+}
+
+message SetupReply {
+    bool success = 1;
+    string message = 2;
+}
