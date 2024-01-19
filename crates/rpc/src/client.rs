@@ -36,8 +36,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let verify_request = tonic::Request::new(VerifyRequest {
         wasm_image_id: "fibb".to_string(),
     });
-    let Verify_response = client.single_verify(verify_request).await?;
-    println!("Received prove response {:?}", Verify_response);
+    let verify_response = client.single_verify(verify_request).await?;
+    println!("Received prove response {:?}", verify_response);
 
     Ok(())
 }
