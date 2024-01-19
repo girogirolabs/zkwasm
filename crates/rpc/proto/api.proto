@@ -4,6 +4,8 @@ package rpc;
 
 service ZkWasm {
     rpc Setup (SetupRequest) returns (SetupReply) {}
+    rpc SingleProve (ProveRequest) returns (ProveReply) {}
+    rpc SingleVerify (VerifyRequest) returns (VerifyReply) {}
 }
 
 message SetupRequest {
@@ -12,6 +14,27 @@ message SetupRequest {
 }
 
 message SetupReply {
+    bool success = 1;
+    string message = 2;
+}
+
+message ProveRequest {
+    uint32 zkwasm_k = 1;
+    string wasm_image_id = 2;
+    repeated uint64 public_inputs = 3;
+    repeated uint64 private_inputs = 4;
+}
+
+message ProveReply {
+    bool success = 1;
+    string message = 2;
+}
+
+message VerifyRequest {
+    string wasm_image_id = 1;
+}
+
+message VerifyReply {
     bool success = 1;
     string message = 2;
 }
