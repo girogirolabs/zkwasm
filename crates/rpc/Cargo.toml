@@ -16,9 +16,15 @@ path = "src/client.rs"
 [dependencies]
 tonic = "0.10"
 prost = "0.12"
+log = "0.4.17"
 tokio = { version = "1.0", "features" = ["macros", "rt-multi-thread"]}
 delphinus-cli = { path = "../cli" }
 delphinus-zkwasm = { path = "../zkwasm" }
+anyhow.workspace = true
+circuits-batcher = { git = "https://github.com/DelphinusLab/continuation-batcher.git" }
+halo2aggregator-s.workspace = true
+halo2_proofs.workspace = true
+wasmi.workspace = true
 
 [build-dependencies]
 tonic-build = "0.10"

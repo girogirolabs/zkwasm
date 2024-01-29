@@ -2398,12 +2398,18 @@ dependencies = [
 name = "rpc"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "circuits-batcher",
  "delphinus-cli",
  "delphinus-zkwasm",
+ "halo2_proofs",
+ "halo2aggregator-s",
+ "log",
  "prost",
  "tokio",
  "tonic",
  "tonic-build",
+ "wasmi",
 ]
 
 [[package]]

@@ -11,12 +11,12 @@ use crate::rpc::{VerifyRequest, VerifyReply};
 
 use delphinus_zkwasm::runtime::host::default_env::DefaultHostEnvBuilder;
 use delphinus_zkwasm::runtime::host::default_env::ExecutionArg;
-use delphinus_cli::exec;
 
 pub mod rpc {
     tonic::include_proto!("rpc");
 }
 pub mod asset;
+pub mod exec;
 
 #[derive(Debug, Default)]
 pub struct ZkWasmRpcServer {}
