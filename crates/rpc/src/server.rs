@@ -33,12 +33,13 @@ impl ZkWasm for ZkWasmRpcServer {
         let wasm_image_id = setup_request.wasm_image_id;
         let wasm_image_path = asset::get_wasm_image_path(&wasm_image_id);
         let wasm_image_bin: Vec<u8> = fs::read(&wasm_image_path).unwrap();
-        let setup_res = exec::exec_setup::<ExecutionArg, DefaultHostEnvBuilder>(
+        let setup_res = exec::exec_setup::<DefaultHostEnvBuilder>(
             zkwasm_k,
             22,
             "zkwasm-rpc-server",
             wasm_image_bin,
             vec![],
+            (),
             &asset::get_and_create_output_dir(&wasm_image_id),
             &asset::get_and_create_params_dir(&wasm_image_id),
         );
@@ -68,20 +69,20 @@ impl ZkWasm for ZkWasmRpcServer {
         let private_inputs: Vec<u64> = prove_request.private_inputs.to_vec();
         let context_in = vec![];
         let context_out = Arc::new(Mutex::new(vec![]));
-        let prove_res = exec::exec_create_proof::<ExecutionArg, DefaultHostEnvBuilder>(
+        let prove_res = exec::exec_create_proof::<DefaultHostEnvBuilder>(
             "zkwasm-rpc-server",
             zkwasm_k,
             wasm_image_bin,
             vec![],
             &asset::get_and_create_output_dir(&wasm_image_id),
             &asset::get_and_create_params_dir(&wasm_image_id),
-            // create a ExecutionArg in server
             ExecutionArg {
                 public_inputs,
                 private_inputs,
                 context_inputs: context_in,
                 context_outputs: context_out.clone(),
             },
+            (),
         );
 
         let reply = rpc::ProveReply {

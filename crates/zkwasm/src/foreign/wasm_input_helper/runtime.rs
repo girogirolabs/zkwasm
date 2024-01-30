@@ -1,18 +1,21 @@
 use std::cell::RefCell;
+use std::collections::VecDeque;
 use std::rc::Rc;
 
 use specs::host_function::HostPlugin;
 use specs::types::ValueType;
+use wasmi::tracer::Observer;
 
 use crate::runtime::host::host_env::HostEnv;
 use crate::runtime::host::ForeignContext;
+use crate::runtime::host::ForeignStatics;
 use crate::runtime::wasmi_interpreter::WasmRuntimeIO;
 
 use super::Op;
 
 pub struct Context {
     pub public_inputs: Vec<u64>,
-    pub private_inputs: Vec<u64>,
+    pub private_inputs: VecDeque<u64>,
     pub instance: Rc<RefCell<Vec<u64>>>,
     pub output: Rc<RefCell<Vec<u64>>>,
 }
@@ -26,7 +29,7 @@ impl Context {
     ) -> Self {
         Context {
             public_inputs,
-            private_inputs,
+            private_inputs: private_inputs.into(),
             instance,
             output,
         }
@@ -43,7 +46,7 @@ impl Context {
         if self.private_inputs.is_empty() {
             panic!("failed to read private input, please checkout your input");
         }
-        self.private_inputs.remove(0)
+        self.private_inputs.pop_front().unwrap()
     }
 
     fn push_public(&mut self, value: u64) {
@@ -78,7 +81,11 @@ impl Context {
     }
 }
 
-impl ForeignContext for Context {}
+impl ForeignContext for Context {
+    fn get_statics(&self) -> Option<ForeignStatics> {
+        None
+    }
+}
 
 pub fn register_wasm_input_foreign(
     env: &mut HostEnv,
@@ -89,9 +96,8 @@ pub fn register_wasm_input_foreign(
     let outputs = Rc::new(RefCell::new(vec![]));
 
     let wasm_input = Rc::new(
-        |context: &mut dyn ForeignContext, args: wasmi::RuntimeArgs| {
+        |_observer: &Observer, context: &mut dyn ForeignContext, args: wasmi::RuntimeArgs| {
             let context = context.downcast_mut::<Context>().unwrap();
-
             let arg: i32 = args.nth(0);
             let input = context.wasm_input(arg);
 
@@ -100,7 +106,7 @@ pub fn register_wasm_input_foreign(
     );
 
     let wasm_output = Rc::new(
-        |context: &mut dyn ForeignContext, args: wasmi::RuntimeArgs| {
+        |_observer: &Observer, context: &mut dyn ForeignContext, args: wasmi::RuntimeArgs| {
             let context = context.downcast_mut::<Context>().unwrap();
 
             let value: i64 = args.nth(0);
@@ -111,6 +117,7 @@ pub fn register_wasm_input_foreign(
     );
 
     env.internal_env.register_plugin(
+        "wasm input plugin",
         HostPlugin::HostInput,
         Box::new(Context::new(
             public_inputs,
